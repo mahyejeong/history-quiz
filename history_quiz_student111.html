@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>역사 복습 퀴즈</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff9f0;--surface:#ffffff;--primary:#ff7043;--primary-light:#ffccbc;--secondary:#66bb6a;--secondary-light:#e8f5e9;--ok:#43a047;--ok-bg:#e8f5e9;--ng:#e53935;--ng-bg:#ffebee;--text:#3e2723;--text2:#8d6e63;--border:rgba(62,39,35,0.12);--radius:16px;--card-size:min(42vw,160px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nanum Gothic',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto}
+.page{display:none}.page.on{display:flex;flex-direction:column;min-height:100vh}
+#page-intro{align-items:center;justify-content:center;padding:2rem 1.25rem}
+.intro-illust{font-size:64px;margin-bottom:1rem;animation:bounce 1.8s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.intro-title{font-family:'Jua',sans-serif;font-size:28px;color:var(--primary);margin-bottom:6px;text-align:center}
+.intro-sub{font-size:13px;color:var(--text2);margin-bottom:2rem;text-align:center;line-height:1.7}
+.form-card{width:100%;background:var(--surface);border:2px solid var(--primary-light);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:12px;font-weight:700;color:var(--text2)}
+.form-group input{font-family:'Nanum Gothic',sans-serif;font-size:16px;padding:11px 13px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s}
+.form-group input:focus{border-color:var(--primary)}
+.form-group input::placeholder{color:#c8b4ae;font-size:13px}
+.btn-start{width:100%;padding:15px;font-family:'Jua',sans-serif;font-size:18px;border:none;border-radius:var(--radius);background:var(--primary);color:#fff;cursor:pointer;letter-spacing:1px;transition:transform .1s;box-shadow:0 4px 0 #bf360c}
+.btn-start:active{transform:translateY(3px);box-shadow:0 1px 0 #bf360c}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:1.5rem}
+.tag{font-size:11px;padding:4px 10px;border-radius:99px;background:var(--secondary-light);color:#2e7d32;font-weight:700}
+.score-bonus-info{font-size:11px;color:var(--text2);text-align:center;margin-top:10px;line-height:1.8}
+#page-game{padding:1rem 1rem 1.5rem}
+.game-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.g-nametag{font-size:13px;color:var(--text2);font-weight:700}
+.g-score-wrap{display:flex;align-items:center;gap:6px}
+.g-score{font-family:'Jua',sans-serif;font-size:20px;color:var(--primary)}
+.combo-badge{font-family:'Jua',sans-serif;font-size:12px;padding:3px 10px;border-radius:99px;background:#388e3c;color:#fff;display:none;animation:pop .3s ease}
+.combo-badge.on{display:inline-block}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.prog-wrap{margin-bottom:10px}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;font-weight:700}
+.prog-bar{height:8px;background:#f5ccc0;border-radius:99px}
+.prog-fill{height:8px;background:linear-gradient(90deg,var(--primary),#ff8a65);border-radius:99px;transition:width .4s ease}
+.fb-area{text-align:center;font-size:14px;font-weight:700;padding:10px 12px;border-radius:12px;margin-bottom:12px;min-height:44px;display:flex;align-items:center;justify-content:center;line-height:1.5;transition:all .2s}
+.fb-area.idle{background:#f5ede8;color:var(--text2)}
+.fb-area.ok{background:var(--ok-bg);color:var(--ok)}
+.fb-area.ng{background:var(--ng-bg);color:var(--ng)}
+.fb-area.combo{background:#e8f5e9;color:#2e7d32}
+.card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mcard{height:var(--card-size);border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:12px 10px;text-align:center;font-size:clamp(12px,3vw,14px);line-height:1.5;font-weight:700;transition:transform .12s;user-select:none;word-break:keep-all}
+.mcard:active{transform:scale(.93)}
+.mcard.back{background:var(--secondary);color:transparent;border:3px solid rgba(255,255,255,.2);font-size:32px}
+.mcard.back::before{content:"❓"}
+.mcard.flipped{background:var(--surface);color:var(--text);border:3px solid var(--secondary)}
+.mcard.matched{background:var(--ok-bg);color:var(--ok);border:3px solid var(--ok);cursor:default}
+.mcard.matched:active{transform:none}
+.mcard.wrong{background:var(--ng-bg);color:var(--ng);border:3px solid var(--ng);animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.score-pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Jua',sans-serif;font-size:32px;color:#2e7d32;pointer-events:none;z-index:999;opacity:0}
+.score-pop.show{animation:floatUp .9s ease forwards}
+@keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(-50%,-120%)}}
+#page-result{align-items:center;justify-content:center;padding:2rem 1.25rem;text-align:center}
+.result-emoji{font-size:56px;margin-bottom:.75rem;animation:bounce 1.8s infinite}
+.result-title{font-family:'Jua',sans-serif;font-size:22px;color:var(--text2);margin-bottom:4px}
+.result-score-big{font-family:'Jua',sans-serif;font-size:56px;color:var(--primary);line-height:1;margin-bottom:4px}
+.result-sub{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
+.stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:2px solid var(--primary-light);border-radius:var(--radius);padding:14px 8px}
+.stat-n{font-family:'Jua',sans-serif;font-size:24px;color:var(--primary)}
+.stat-l{font-size:11px;color:var(--text2);margin-top:3px;font-weight:700}
+.btn-row{display:flex;flex-direction:column;gap:8px;width:100%}
+.btn-outline{padding:13px;font-family:'Jua',sans-serif;font-size:15px;border:2px solid var(--primary-light);border-radius:var(--radius);background:var(--surface);color:var(--primary);cursor:pointer}
+.btn-outline:active{background:var(--primary-light)}
+.btn-solid{padding:15px;font-family:'Jua',sans-serif;font-size:17px;border:none;border-radius:var(--radius);background:var(--primary);color:#fff;cursor:pointer;box-shadow:0 4px 0 #bf360c;transition:transform .1s}
+.btn-solid:active{transform:translateY(3px);box-shadow:0 1px 0 #bf360c}
+.submit-msg{font-size:12px;color:var(--ok);margin-top:10px;font-weight:700;text-align:center}
+</style>
+</head>
+<body>
+<div id="score-pop" class="score-pop"></div>
+
+<div id="page-intro" class="page on">
+  <div class="intro-illust">📜</div>
+  <div class="intro-title">역사 복습 퀴즈</div>
+  <div class="intro-sub">카드를 뒤집어 단어와 설명을 연결하세요!<br>연속으로 맞추면 콤보 보너스!</div>
+  <div class="form-card">
+    <div class="form-row" style="grid-template-columns:1fr;">
+      <div class="form-group"><label>학번</label><input id="inp-num" type="text" placeholder="예) 2301" maxlength="6" inputmode="numeric"></div>
+      <div class="form-group"><label>이름</label><input id="inp-name" type="text" placeholder="홍길동" maxlength="10"></div>
+    </div>
+  </div>
+  <button class="btn-start" onclick="startGame()">시작하기 🚀</button>
+  <div class="tag-row">
+    <span class="tag">그리스</span><span class="tag">헬레니즘</span><span class="tag">서아시아</span><span class="tag">22단어</span>
+  </div>
+  <div class="score-bonus-info">✅ 정답 +10점 &nbsp;|&nbsp; 🔥 2콤보 +5 &nbsp;|&nbsp; ⚡ 3콤보 +10 &nbsp;|&nbsp; 💥 4콤보+ +20</div>
+</div>
+
+<div id="page-game" class="page">
+  <div class="game-top">
+    <span class="g-nametag" id="g-nametag"></span>
+    <div class="g-score-wrap">
+      <span class="combo-badge" id="g-combo"></span>
+      <span class="g-score" id="g-score">0점</span>
+    </div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-labels"><span id="g-round-lbl"></span><span id="g-pair-lbl"></span></div>
+    <div class="prog-bar"><div class="prog-fill" id="g-prog" style="width:0%"></div></div>
+  </div>
+  <div class="fb-area idle" id="g-fb">카드 두 장을 뒤집어 보세요 👆</div>
+  <div class="card-grid" id="g-grid"></div>
+</div>
+
+<div id="page-result" class="page">
+  <div class="result-emoji" id="r-emoji"></div>
+  <div class="result-title" id="r-name"></div>
+  <div class="result-score-big" id="r-score"></div>
+  <div class="result-sub" id="r-grade"></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-n" id="r-matched"></div><div class="stat-l">매칭 성공</div></div>
+    <div class="stat-card"><div class="stat-n" id="r-tries"></div><div class="stat-l">시도 횟수</div></div>
+    <div class="stat-card"><div class="stat-n" id="r-maxcombo"></div><div class="stat-l">최대 콤보</div></div>
+    <div class="stat-card"><div class="stat-n" id="r-time"></div><div class="stat-l">소요 시간</div></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-outline" onclick="retryGame()">같은 문제 다시 풀기</button>
+    <button class="btn-solid" onclick="newGame()">새 문제 뽑기 🎲</button>
+  </div>
+  <div class="submit-msg" id="submit-msg"></div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCcy2QOxNOI2JV-RbuD32kdrexd-4QgXAk",
+  authDomain:"history-card-game-a551c.firebaseapp.com",
+  databaseURL:"https://history-card-game-a551c-default-rtdb.firebaseio.com",
+  projectId:"history-card-game-a551c",
+  storageBucket:"history-card-game-a551c.firebasestorage.app",
+  messagingSenderId:"538118297509",
+  appId:"1:538118297509:web:2772de05dcbc7b1e4efa4c"
+});
+const db = firebase.database();
+
+const DATA=[
+  {w:"아시리아",c:"서아시아를 최초로 통일, 강압 정책으로 멸망"},
+  {w:"페르시아",c:"서아시아 재통일, 타 국가에 관용정책 시행"},
+  {w:"조로아스터교",c:"페르시아 종교, 선과 악의 대립으로 세상을 바라봄"},
+  {w:"폴리스",c:"그리스의 도시국가"},
+  {w:"솔론",c:"금권정치를 실시한 인물"},
+  {w:"클레이스테네스",c:"혈연 부족제 → 거주지 중심으로 바꾼 인물"},
+  {w:"도편추방제",c:"아테네에서 독재자 추방을 위해 만든 제도"},
+  {w:"페리클레스",c:"공직자 추첨제·수당제를 시행한 인물"},
+  {w:"펠로폰네소스",c:"스파르타가 위치한 평원, 스파르타 동맹 이름"},
+  {w:"헤로도토스",c:"역사의 아버지, 그리스-페르시아 전쟁 기록"},
+  {w:"투키디데스",c:"펠로폰네소스 전쟁을 기록한 인물"},
+  {w:"소피스트",c:"진리는 주관적·상대적이라 주장한 사람들"},
+  {w:"소크라테스",c:"진리는 절대적·객관적이라 주장한 인물"},
+  {w:"마케도니아",c:"그리스를 멸망시킨 국가"},
+  {w:"알렉산드로스",c:"마케도니아 전성기, 최대 영토 확보한 인물"},
+  {w:"알렉산드리아",c:"알렉산드로스가 정복지 곳곳에 세운 도시"},
+  {w:"헬레니즘",c:"동방 원정~이집트 멸망까지의 시대·문화"},
+  {w:"세계시민주의",c:"모두가 같은 제국 시민이라는 사상"},
+  {w:"스토아학파",c:"금욕주의로 행복을 주장한 학파"},
+  {w:"에피쿠로스학파",c:"마음의 안정·쾌락으로 행복을 주장한 학파"},
+  {w:"유클리드",c:"기하학을 창시한 인물"},
+  {w:"아르키메데스",c:"부력의 원리를 발견한 인물"},
+];
+
+const PAIRS=4;
+let userName='',userNum='';
+let allPairs=[],roundOffset=0,roundPairs=[],flipped=[],locked=false;
+let matchedTotal=0,tries=0,score=0,combo=0,maxCombo=0,startTime=0,totalPairs=0;
+
+function shuffle(a){return[...a].sort(()=>Math.random()-0.5)}
+function goPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.getElementById(id).classList.add('on')}
+
+function startGame(){
+  const num=document.getElementById('inp-num').value.trim();
+  const name=document.getElementById('inp-name').value.trim();
+  if(!num||!name){alert('학번과 이름을 모두 입력해주세요!');return;}
+  userNum=num;userName=name;
+  allPairs=shuffle(DATA).slice(0,PAIRS*3);
+  totalPairs=allPairs.length;
+  matchedTotal=0;tries=0;score=0;combo=0;maxCombo=0;startTime=Date.now();
+  loadRound(0);goPage('page-game');
+}
+
+function loadRound(offset){
+  roundOffset=offset;roundPairs=allPairs.slice(offset,offset+PAIRS);flipped=[];locked=false;renderRound();
+}
+
+function renderRound(){
+  document.getElementById('g-nametag').textContent=userNum+' '+userName;
+  const rNum=Math.floor(roundOffset/PAIRS)+1;
+  const rTotal=Math.ceil(totalPairs/PAIRS);
+  document.getElementById('g-round-lbl').textContent='라운드 '+rNum+' / '+rTotal;
+  document.getElementById('g-pair-lbl').textContent=matchedTotal+' / '+totalPairs+' 매칭';
+  document.getElementById('g-prog').style.width=Math.round(matchedTotal/totalPairs*100)+'%';
+  document.getElementById('g-score').textContent=score+'점';
+  updateComboUI();
+  const fb=document.getElementById('g-fb');fb.className='fb-area idle';fb.textContent='카드 두 장을 뒤집어 보세요 👆';
+  const cards=[];
+  roundPairs.forEach((p,i)=>{
+    cards.push({text:p.w,pair:i,type:'word'});
+    cards.push({text:p.c,pair:i,type:'clue'});
+  });
+  const grid=document.getElementById('g-grid');grid.innerHTML='';
+  shuffle(cards).forEach(card=>{
+    const div=document.createElement('div');
+    div.className='mcard back';
+    div.dataset.pair=card.pair;div.dataset.text=card.text;div.dataset.type=card.type;
+    div.addEventListener('click',()=>flipCard(div));
+    grid.appendChild(div);
+  });
+}
+
+function updateComboUI(){
+  const el=document.getElementById('g-combo');
+  if(combo>=2){el.classList.add('on');el.textContent=combo+'콤보 🔥';}
+  else{el.classList.remove('on');}
+}
+
+function flipCard(div){
+  if(locked)return;if(!div.classList.contains('back'))return;if(flipped.length>=2)return;
+  div.classList.remove('back');div.classList.add('flipped');div.textContent=div.dataset.text;
+  flipped.push(div);
+  if(flipped.length===2){tries++;locked=true;setTimeout(checkMatch,650);}
+}
+
+function checkMatch(){
+  const [a,b]=flipped;const fb=document.getElementById('g-fb');
+  if(a.dataset.pair===b.dataset.pair&&a.dataset.type!==b.dataset.type){
+    a.classList.remove('flipped');b.classList.remove('flipped');
+    a.classList.add('matched');b.classList.add('matched');
+    matchedTotal++;combo++;if(combo>maxCombo)maxCombo=combo;
+    let bonus=0,bonusMsg='';
+    if(combo===2){bonus=5;bonusMsg='🔥 2콤보 +5!';}
+    else if(combo===3){bonus=10;bonusMsg='⚡ 3콤보 +10!';}
+    else if(combo>=4){bonus=20;bonusMsg='💥 '+combo+'콤보 +20!';}
+    score+=10+bonus;
+    document.getElementById('g-score').textContent=score+'점';
+    document.getElementById('g-pair-lbl').textContent=matchedTotal+' / '+totalPairs+' 매칭';
+    document.getElementById('g-prog').style.width=Math.round(matchedTotal/totalPairs*100)+'%';
+    updateComboUI();
+    if(bonus>0){fb.className='fb-area combo';fb.textContent=bonusMsg+' 대단해요!';showScorePop('+'+(10+bonus));}
+    else{fb.className='fb-area ok';fb.textContent='정답! ✨ +10점';showScorePop('+10');}
+    flipped=[];locked=false;
+    const doneInRound=document.querySelectorAll('#g-grid .mcard.matched').length/2;
+    if(doneInRound>=roundPairs.length){
+      setTimeout(()=>{const next=roundOffset+PAIRS;if(next<totalPairs){loadRound(next);}else{showResult();}},900);
+    }
+  } else {
+    a.classList.remove('flipped');b.classList.remove('flipped');
+    a.classList.add('wrong');b.classList.add('wrong');
+    combo=0;updateComboUI();
+    fb.className='fb-area ng';fb.textContent='아깝다! 다시 시도해봐요 💪';
+    setTimeout(()=>{a.classList.remove('wrong');b.classList.remove('wrong');a.classList.add('back');b.classList.add('back');a.textContent='';b.textContent='';flipped=[];locked=false;},750);
+  }
+}
+
+function showScorePop(text){
+  const el=document.getElementById('score-pop');el.textContent=text;
+  el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),900);
+}
+
+function showResult(){
+  const elapsed=Math.round((Date.now()-startTime)/1000);
+  const acc=Math.min(100,Math.round(totalPairs/tries*100));
+  let emoji='🎉',grade='';
+  if(score>=totalPairs*10+30){emoji='🏆';grade='완벽해요! 역사 마스터!';}
+  else if(score>=totalPairs*10+10){emoji='🌟';grade='훌륭해요! 콤보 실력자!';}
+  else if(score>=totalPairs*10){emoji='😊';grade='잘 했어요!';}
+  else{emoji='💪';grade='조금 더 연습해봐요!';}
+  document.getElementById('r-emoji').textContent=emoji;
+  document.getElementById('r-name').textContent=userNum+' '+userName+'님의 결과';
+  document.getElementById('r-score').textContent=score+'점';
+  document.getElementById('r-grade').textContent=grade;
+  document.getElementById('r-matched').textContent=totalPairs+'쌍';
+  document.getElementById('r-tries').textContent=tries+'회';
+  document.getElementById('r-maxcombo').textContent=maxCombo+'콤보';
+  document.getElementById('r-time').textContent=elapsed+'초';
+  goPage('page-result');
+  submitResult(elapsed,acc);
+}
+
+function submitResult(elapsed,acc){
+  const key=userNum+'_'+userName.replace(/\s/g,'');
+  db.ref('results/'+key).set({
+    학번:userNum,이름:userName,점수:score,
+    최대콤보:maxCombo,시도횟수:tries,소요시간:elapsed,
+    정확도:acc,완료:true,제출시각:firebase.database.ServerValue.TIMESTAMP
+  }).then(()=>{
+    document.getElementById('submit-msg').textContent='✅ 결과가 선생님께 제출되었어요!';
+  }).catch(()=>{
+    document.getElementById('submit-msg').textContent='⚠️ 제출 실패. 인터넷 연결을 확인해주세요.';
+  });
+}
+
+function retryGame(){
+  matchedTotal=0;tries=0;score=0;combo=0;maxCombo=0;startTime=Date.now();loadRound(0);goPage('page-game');
+}
+function newGame(){
+  allPairs=shuffle(DATA).slice(0,PAIRS*3);
+  matchedTotal=0;tries=0;score=0;combo=0;maxCombo=0;startTime=Date.now();loadRound(0);goPage('page-game');
+}
+</script>
+</body>
+</html>
