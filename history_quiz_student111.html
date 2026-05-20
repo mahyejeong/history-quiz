@@ -15,11 +15,11 @@ body{font-family:'Nanum Gothic',sans-serif;background:var(--bg);color:var(--text
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .intro-title{font-family:'Jua',sans-serif;font-size:28px;color:var(--primary);margin-bottom:6px;text-align:center}
 .intro-sub{font-size:13px;color:var(--text2);margin-bottom:2rem;text-align:center;line-height:1.7}
-.form-card{width:100%;background:var(--surface);border:2px solid var(--primary-light);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem}
+.form-card{width:100%;background:var(--surface);border:2px solid var(--primary-light);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;overflow:hidden}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group{display:flex;flex-direction:column;gap:6px;min-width:0}
 .form-group label{font-size:12px;font-weight:700;color:var(--text2)}
-.form-group input{font-family:'Nanum Gothic',sans-serif;font-size:16px;padding:11px 13px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s}
+.form-group input{font-family:'Nanum Gothic',sans-serif;font-size:16px;padding:11px 13px;width:100%;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;transition:border-color .2s}
 .form-group input:focus{border-color:var(--primary)}
 .form-group input::placeholder{color:#c8b4ae;font-size:13px}
 .btn-start{width:100%;padding:15px;font-family:'Jua',sans-serif;font-size:18px;border:none;border-radius:var(--radius);background:var(--primary);color:#fff;cursor:pointer;letter-spacing:1px;transition:transform .1s;box-shadow:0 4px 0 #bf360c}
